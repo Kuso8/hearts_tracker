@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hearts karta tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .suit-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+      max-width: 700px;
+    }
+    .card {
+      width: 40px;
+      height: 60px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      margin: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+      font-size: 18px;
+      background-color: white;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .card.played {
+      background-color: lightgray;
+      color: darkgray;
+      text-decoration: line-through;
+      cursor: pointer;
+    }
+    .hearts, .diamonds {
+      color: #D90000; /* výraznejšia červená */
+    }
+    .spades, .clubs {
+      color: black;
+    }
+    #reset-btn {
+      margin-bottom: 15px;
+      padding: 8px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background-color: #D90000;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    #reset-btn:hover {
+      background-color: #A00000;
+    }
+    .suit-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hearts karta tracker</h1>
+  <p>Klikni na kartu, ktorú si zahral. Kliknutím na označenú kartu ju môžeš odznačiť.</p>
+
+  <button id="reset-btn">Reset</button>
+
+  <div id="hearts-row" class="suit-row">
+    <div class="suit-label">Srdcia ♥</div>
+  </div>
+  <div id="diamonds-row" class="suit-row">
+    <div class="suit-label">Káry ♦</div>
+  </div>
+  <div id="spades-row" class="suit-row">
+    <div class="suit-label">Piky ♠</div>
+  </div>
+  <div id="clubs-row" class="suit-row">
+    <div class="suit-label">Kríže ♣</div>
+  </div>
+
+  <script>
+    const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    const suits = [
+      { symbol: '♥', name: 'hearts', color: '#D90000', containerId: 'hearts-row' },
+      { symbol: '♦', name: 'diamonds', color: '#D90000', containerId: 'diamonds-row' },
+      { symbol: '♠', name: 'spades', color: 'black', containerId: 'spades-row' },
+      { symbol: '♣', name: 'clubs', color: 'black', containerId: 'clubs-row' }
+    ];
+
+    const resetBtn = document.getElementById('reset-btn');
+
+    let cards = [];
+    suits.forEach(suit => {
+      ranks.forEach(rank => {
+        cards.push({ rank, suit: suit.symbol, suitName: suit.name, played: false });
+      });
+    });
+
+    function renderCards() {
+      // Vyčistíme každý riadok, ale necháme label (prvý element)
+      suits.forEach(suit => {
+        const container = document.getElementById(suit.containerId);
+        // Odstránime všetky karty okrem prvého elementu (label)
+        while (container.children.length > 1) {
+          container.removeChild(container.lastChild);
+        }
+      });
+
+      cards.forEach((card, index) => {
+        const container = document.getElementById(suits.find(s => s.name === card.suitName).containerId);
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card ' + card.suitName + (card.played ? ' played' : '');
+        cardDiv.textContent = card.rank + card.suit;
+        cardDiv.style.color = card.played ? 'darkgray' : suits.find(s => s.name === card.suitName).color;
+        cardDiv.onclick = () => {
+          cards[index].played = !cards[index].played; // prepína stav
+          renderCards();
+        };
+        container.appendChild(cardDiv);
+      });
+    }
+
+    resetBtn.onclick = () => {
+      cards.forEach(card => card.played = false);
+      renderCards();
+    };
+
+    renderCards();
+  </script>
+
+</body>
+</html>
